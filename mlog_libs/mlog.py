@@ -130,13 +130,15 @@ class mlog(object):
     """
 
     def __init__(self, subsystem, constraints=None, config=None, logfile=None,
-                 authuser=False, module=False, method=False, call_id=False,
-                 changecallback=None):
+                 ip_address=False, authuser=False, module=False,
+                 method=False, call_id=False, changecallback=None):
         if not subsystem:
             raise ValueError("Subsystem must be supplied")
 
         self.user = _getpass.getuser()
-        self.parentfile = _os.path.abspath(_inspect.getfile(_inspect.stack()[1][0]))
+        self.parentfile = _os.path.abspath(_inspect.getfile(
+            _inspect.stack()[1][0]))
+        self.ip_address = ip_address
         self.authuser = authuser
         self.module = module
         self.method = method
@@ -293,10 +295,12 @@ class mlog(object):
         self._user_log_level = -1
         self._callback()
 
-    def _get_ident(self, level, user, parentfile, authuser, module, method,
-                   call_id):
+    def _get_ident(self, level, user, parentfile, ip_address, authuser, module,
+                   method, call_id):
         infos = [self._subsystem, _MLOG_LEVEL_TO_TEXT[level],
                  repr(time.time()), user, parentfile, str(_os.getpid())]
+        if self.ip_address:
+            infos.append(str(ip_address) if ip_address else '-')
         if self.authuser:
             infos.append(str(authuser) if authuser else '-')
         if self.module:
@@ -337,8 +341,8 @@ class mlog(object):
                 ': ' + str(e) + '.'
             _warnings.warn(err)
 
-    def log_message(self, level, message, authuser=None, module=None, method=None,
-              call_id=None):
+    def log_message(self, level, message, ip_address=None, authuser=None,
+                    module=None, method=None, call_id=None):
 #        message = str(message)
         level = self._resolve_log_level(level)
 
@@ -349,8 +353,8 @@ class mlog(object):
            or self._get_time_since_start() >= self._recheck_api_time):
             self.update_config()
 
-        ident = self._get_ident(level, self.user, self.parentfile, authuser, module, method,
-                                call_id)
+        ident = self._get_ident(level, self.user, self.parentfile, ip_address,
+                                authuser, module, method, call_id)
         # If this message is an emergency, send a copy to the emergency
         # facility first.
         if(level == 0):
