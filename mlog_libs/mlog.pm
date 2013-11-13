@@ -193,6 +193,7 @@ sub new {
     $self->{module} = _get_option($options, 'module');
     $self->{method} = _get_option($options, 'method');
     $self->{call_id} = _get_option($options, 'call_id');
+    $self->{ip_address} = _get_option($options, 'ip_address');
     $self->{_callback} = defined $options->{"changecallback"} ? 
             $options->{"changecallback"} : sub {};
     $self->{_subsystem} = $sub;
@@ -367,17 +368,18 @@ sub clear_user_log_level {
 }
 
 sub _get_ident {
-    my ($self, $level, $authuser, $module, $method, $call_id) = @_;
+    my ($self, $level, $authuser, $module, $method, $call_id, $ip_address) = @_;
     my @infos = ($self->{_subsystem}, $_MLOG_LEVEL_TO_TEXT->{$level},
                     Time::HiRes::time(), $USER, $PARENT_FILE, $$);
-    if ($self->{authuser}) {
+    if ($self->{ip_address}) {
+        push @infos, $ip_address || '-';
+    } if ($self->{authuser}) {
         push @infos, $authuser || '-';
-    }
-    if ($self->{module}) {
+    } if ($self->{module}) {
         push @infos, $module || '-';
-    }if ($self->{method}) {
+    } if ($self->{method}) {
         push @infos, $method || '-';
-    }if ($self->{call_id}) {
+    } if ($self->{call_id}) {
         push @infos, $call_id || '-';
     }
     return "[" . join("] [", @infos). "]";
@@ -413,7 +415,8 @@ sub _log {
 }
 
 sub log_message {
-    my ($self, $level, $message, $authuser, $module, $method, $call_id) = @_;
+    my ($self, $level, $message, $authuser, $module, $method, $call_id,
+        $ip_address) = @_;
     $level = $self->_resolve_log_level($level);
 
     ++$self->{msg_count};
@@ -424,7 +427,8 @@ sub log_message {
         $self->update_config();
     }
 
-    my $ident = $self->_get_ident($level, $authuser, $module, $method, $call_id);
+    my $ident = $self->_get_ident($level, $authuser, $module, $method, $call_id,
+        $ip_address);
     # If this message is an emergency, send a copy to the emergency facility first.
     if($level == 0) {
         $self->_syslog($EMERG_FACILITY, $level, $ident, $message);
