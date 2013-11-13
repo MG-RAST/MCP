@@ -20,7 +20,12 @@ syslog.openlog("[MCP] [INFO] [" + user + "] [" + MCP_path + "] ", syslog.LOG_PID
 path = list(sys.path)
 sys.path.insert(0, MCP_dir+"mcp_modules/")
 
-json_conf_file = open(MCP_dir+'conf/conf.json')
+if 'MCP_CONF' not in os.environ.keys() or os.environ['MCP_CONF'] == '':
+    sys.stderr.write("ERROR: please set MCP_CONF environment variable to the location of the MCP configuration file.\n")
+    sys.exit()
+    
+json_conf_file_path = os.environ['MCP_CONF']
+json_conf_file = open(json_conf_file_path)
 json_conf = json.load(json_conf_file)
 
 def main():
