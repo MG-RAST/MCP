@@ -1,8 +1,8 @@
 from subsystem import subsystem
 
 class control_api(subsystem):
-    def __init__(self, MCP_path):
-        subsystem.__init__(self, MCP_path)
+    def __init__(self, MCP_dir, json_conf_file_path):
+        subsystem.__init__(self, MCP_dir, json_conf_file_path)
 
     def start(self, params):
         function = 'start'
@@ -14,7 +14,7 @@ class control_api(subsystem):
 
         for subsystem in self.json_conf['global']['subsystems']:
             myclass = getattr(__import__(subsystem), subsystem)
-            mysubsystem = myclass(self.MCP_path)
+            mysubsystem = myclass(self.MCP_dir, self.json_conf_file_path)
             myfunction = getattr(mysubsystem, "update_status")
             myfunction("")
 

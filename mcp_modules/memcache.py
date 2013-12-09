@@ -1,8 +1,8 @@
 from subsystem import subsystem
 
 class memcache(subsystem):
-    def __init__(self, MCP_path):
-        subsystem.__init__(self, MCP_path)
+    def __init__(self, MCP_dir, json_conf_file_path):
+        subsystem.__init__(self, MCP_dir, json_conf_file_path)
 
     def clear(self, params):
         function = 'clear'
