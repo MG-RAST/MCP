@@ -44,7 +44,7 @@ def main():
         module = __import__(subsystem)
         myclass = getattr(module, subsystem)
         # Create the python class instance dynamically
-        mysubsystem = myclass(MCP_path)
+        mysubsystem = myclass(MCP_dir, json_conf_file_path)
         function, function_params = mysubsystem.parse_subsystem_params(params)
         myfunction = getattr(mysubsystem, function)
         if(len(params) == 1):

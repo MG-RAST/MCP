@@ -6,11 +6,11 @@ import sys
 import urllib
 
 class subsystem (object):
-    def __init__(self, MCP_path):
+    def __init__(self, MCP_dir, conf_path):
         self.MCP_path = MCP_path
         matchObj = re.match(r'(^.*\/)', self.MCP_path)
         self.MCP_dir = matchObj.group(0)
-        json_conf_file = open(self.MCP_dir+'conf/conf.json')
+        json_conf_file = open(conf_path)
         self.json_conf = json.load(json_conf_file)
 
         self.subsystem = self.__class__.__name__

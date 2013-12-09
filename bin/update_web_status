@@ -12,8 +12,13 @@ def main():
     parser = argparse.ArgumentParser(description='program for updating the web subsystem status in the control api')
     args = parser.parse_args()
 
-    conf_file = open(os.path.dirname(__file__) + "/../conf/conf.json")
-    json_conf = json.load(conf_file)
+    if 'MCP_CONF' not in os.environ.keys() or os.environ['MCP_CONF'] == '':
+	sys.stderr.write("ERROR: please set MCP_CONF environment variable to the location of the MCP configuration file.\n")
+	sys.exit()
+
+    json_conf_file_path = os.environ['MCP_CONF']
+    json_conf_file = open(json_conf_file_path)
+    json_conf = json.load(json_conf_file)
     api_dir = json_conf['global']['api_dir'] + "/" + str(json_conf['global']['api_version'])
     api_fname = json_conf['global']['api_dir'] + "/" + str(json_conf['global']['api_version']) + "/web"
 
